@@ -1,0 +1,15 @@
+const { createClient } = require('@supabase/supabase-js');
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+
+let supabase;
+
+if (supabaseUrl && supabaseKey) {
+    supabase = createClient(supabaseUrl, supabaseKey);
+    console.log('[Supabase] Client initialized');
+} else {
+    console.log('[Supabase] Keys not found, Supabase client NOT initialized. Please check your .env file');
+}
+
+module.exports = supabase;

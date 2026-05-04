@@ -1,0 +1,69 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ═══════════════════════════════════════════════════
+   PYROCHAIN — SHOPIFY-INSPIRED DESIGN SYSTEM
+   Black · White · Grey  (no colour noise)
+════════════════════════════════════════════════════ */
+:root {
+  /* ── Surfaces ── */
+  --bg-page   : #f6f6f7;        /* Shopify main content grey */
+  --bg-surface: #ffffff;        /* Card / panel white */
+  --bg-nav    : #1a1a1a;        /* Near-black top-bar */
+  --bg-hover  : #f1f1f1;        /* Row / item hover */
+  --bg-input  : #ffffff;
+
+  /* ── Borders ── */
+  --border    : #e1e3e5;        /* Shopify card border */
+  --border-md : #c9cccf;
+  --border-dark: #303030;       /* Used on dark surfaces */
+
+  /* ── Text ── */
+  --text-primary  : #1a1a1a;
+  --text-secondary: #6d7175;
+  --text-muted    : #8c9196;
+  --text-on-dark  : #f6f6f7;
+  --text-on-dark-2: #a3a3a3;
+
+  /* ── Severity (kept vivid so alerts stand out on white) ── */
+  --sev-critical: #e51c00;
+  --sev-high    : #e07d10;
+  --sev-medium  : #b98900;
+  --sev-low     : #007a5a;
+  --sev-normal  : #6d7175;
+
+  --sev-critical-bg: #fff4f2;
+  --sev-high-bg   : #fff5e9;
+  --sev-medium-bg : #fffbe6;
+  --sev-low-bg    : #f1faf6;
+
+  /* ── Misc ── */
+  --font-mono : 'Courier New', 'Consolas', monospace;
+  --radius    : 8px;
+  --radius-lg : 12px;
+  --shadow-sm : 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md : 0 4px 12px rgba(0,0,0,0.08);
+  --transition: 0.15s ease;
+}
+
+html, body, #root {
+  height: 100%;
+  min-height: 100vh;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; font-family: inherit; border: none; background: none; }
+
+/* Thin scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d0d0d0; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #b0b0b0; }

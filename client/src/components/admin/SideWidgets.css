@@ -1,0 +1,100 @@
+/* ══ Side Widgets — white cards ══ */
+
+/* Zone list */
+.zone-list {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px 12px;
+}
+.zone-empty {
+  text-align: center;
+  color: #8c9196;
+  font-size: 12px;
+  padding: 24px 0;
+  font-family: 'Courier New', monospace;
+}
+
+.zone-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 6px;
+  border-radius: 6px;
+  transition: background 0.13s;
+  cursor: default;
+}
+.zone-item:hover { background: #f6f6f7; }
+
+.zone-rank {
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: #f6f6f7;
+  border: 1px solid #e1e3e5;
+  font-size: 10px;
+  font-weight: 700;
+  color: #6d7175;
+  flex-shrink: 0;
+}
+
+.zone-body { flex: 1; min-width: 0; }
+.zone-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.zone-device {
+  font-size: 10px;
+  color: #8c9196;
+  font-family: 'Courier New', monospace;
+}
+.zone-temp {
+  font-size: 15px;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  flex-shrink: 0;
+}
+
+/* Blockchain queue */
+.bc-queue {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 12px 12px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.bc-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  background: #f6f6f7;
+  border: 1px solid #e1e3e5;
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  animation: bc-slide 0.3s ease;
+}
+@keyframes bc-slide {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.bc-sev {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+.bc--critical .bc-sev { background: #fff4f2; color: #e51c00; }
+.bc--high     .bc-sev { background: #fff5e9; color: #e07d10; }
+.bc--medium   .bc-sev { background: #fffbe5; color: #b98900; }
+.bc--low      .bc-sev { background: #f1faf6; color: #007a5a; }
+
+.bc-hash { color: #6d7175; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

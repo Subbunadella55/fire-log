@@ -1,0 +1,114 @@
+/* ══ Admin Layout — Flex Shell ══ */
+
+.admin-shell {
+  min-height: 100vh;
+  background: #f6f6f7;
+  display: flex;
+  flex-direction: row;
+}
+
+.admin-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.admin-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 58px;
+  padding: 0 28px;
+  background: #ffffff;
+  border-bottom: 1px solid #e1e3e5;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 1005;
+}
+
+.admin-topbar-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: -0.3px;
+}
+
+.topbar-sensor {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6d7175;
+  padding: 5px 12px;
+  border-radius: 20px;
+  background: #f6f6f7;
+  border: 1px solid #e1e3e5;
+}
+.topbar-sensor.online { color: #007a5a; background: #f1faf6; border-color: rgba(0,122,90,0.3); }
+.topbar-sensor.offline { color: #e51c00; background: #fff4f2; border-color: rgba(229,28,0,0.25); }
+
+.topbar-sensor-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.topbar-sensor.online .topbar-sensor-dot {
+  animation: pulse-green 1.8s infinite;
+}
+@keyframes pulse-green {
+  0%,100% { box-shadow: 0 0 0 0 rgba(0,122,90,0.5); }
+  50%      { box-shadow: 0 0 0 4px rgba(0,122,90,0); }
+}
+
+.admin-main {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.admin-layout {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 24px 28px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Analytics display rows */
+.charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.analytics-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+.section-header {
+  margin-top: 24px;
+  margin-bottom: 8px;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 1024px) {
+  .charts-row, .analytics-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 680px)  {
+  .admin-layout  { padding: 14px; gap: 12px; }
+  .admin-topbar { padding-left: 60px; }
+}

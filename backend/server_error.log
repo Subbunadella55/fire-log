@@ -1,0 +1,28 @@
+﻿node : (node:23028) 
+[DEP0040] 
+DeprecationWarning: The 
+`punycode` module is 
+deprecated. Please use a 
+userland alternative instead.
+At line:1 char:1
++ node server.js 2>&1 | 
+Out-File -FilePath 
+"C:\Users\SUBU\Desktop\fire  
+...
++ ~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: ((node:2  
+  3028) [D...native instea   
+ d.:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+(Use `node 
+--trace-deprecation ...` to 
+show where the warning was 
+created)
+[MongoDB] Connection failed: 
+connect ECONNREFUSED 
+::1:27017, connect 
+ECONNREFUSED 127.0.0.1:27017

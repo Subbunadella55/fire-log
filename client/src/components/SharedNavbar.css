@@ -1,0 +1,71 @@
+/* ══ Shared Navbar — used by FireDept & others ══ */
+.shared-nav {
+  height: 56px;
+  background: #1a1a1a;
+  border-bottom: 1px solid #2d2d2d;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  position: sticky;
+  top: 0;
+  z-index: 1010;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.shared-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.shared-nav-brand {
+  font-size: 15px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+}
+
+.shared-nav-divider {
+  width: 1px;
+  height: 16px;
+  background: #3a3a3a;
+}
+
+.shared-nav-role {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #6d6d6d;
+}
+
+.shared-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.shared-nav-user {
+  font-size: 13px;
+  color: #a3a3a3;
+}
+
+.shared-nav-logout {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid #3a3a3a;
+  background: transparent;
+  color: #a3a3a3;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.shared-nav-logout:hover {
+  background: #e51c00;
+  border-color: #e51c00;
+  color: #ffffff;
+}

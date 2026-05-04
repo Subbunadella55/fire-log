@@ -1,0 +1,40 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "C:\\Users\\SUBU\\Desktop\\fire log\\fire-safety-system\\smart-contract\\contracts\\FireAlertLogger.sol": {
+      "lastModificationDate": 1772175030027,
+      "contentHash": "103374daa1e97290bed0a9820e5e0653",
+      "sourceName": "contracts/FireAlertLogger.sol",
+      "solcConfig": {
+        "version": "0.8.19",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.19"
+      ],
+      "artifacts": [
+        "FireAlertLogger"
+      ]
+    }
+  }
+}
