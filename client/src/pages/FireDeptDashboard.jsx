@@ -287,8 +287,10 @@ export default function FireDeptDashboard() {
             {selectedIncident && (
               <div className="fd-final-overlay">
                 <div className="fd-final-modal">
-                  <h1 className="fd-final-title">Confirm Dispatch Unit</h1>
-                  <button className="fd-final-close" onClick={() => setSelectedIncident(null)}>×</button>
+                  <div className="fd-final-header">
+                    <h1 className="fd-final-title">Confirm Dispatch Unit</h1>
+                    <button className="fd-final-close" onClick={() => setSelectedIncident(null)}>×</button>
+                  </div>
                   
                   <div className="fd-final-body">
                     <div className="fd-final-meta">

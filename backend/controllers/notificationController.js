@@ -4,6 +4,18 @@
  */
 require('dotenv').config();
 const nodemailer = require('nodemailer');
+const twilio = require('twilio');
+const supabase = require('../config/supabase');
+
+// ── Configure Twilio Client ─────────
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const twilioNumber = process.env.TWILIO_PHONE_NUMBER;
+
+let twilioClient = null;
+if (accountSid && authToken) {
+  twilioClient = twilio(accountSid, authToken);
+}
 
 // ── Configure Nodemailer transporter ─────────
 const createTransporter = () => {
@@ -95,4 +107,67 @@ Time: ${new Date(alert.sensorTimestamp).toLocaleString()}`;
   return true;
 };
 
-module.exports = { sendAlertEmail, sendAlertSMS };
+// ─────────────────────────────────────────────
+//  Send SMS to People in the Alert Area
+// ─────────────────────────────────────────────
+const sendAreaAlertSMS = async (alert) => {
+  const messageBody = `🚨 URGENT: FIRE ALERT (${alert.severity}) 🚨\nLocation: ${alert.location}\nEvacuate immediately.\nReply STOP to opt out of alerts.`;
+
+  if (!twilioClient) {
+    console.warn('[SMS] Twilio credentials not configured in .env. Simulating SMS to residents...');
+    console.log(`[SMS SIMULATION] To residents in ${alert.location}:\n${messageBody}\n`);
+    return false;
+  }
+
+  let numbersToAlert = [];
+
+  // Fetch phone numbers from Supabase for this specific area
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('residents')
+        .select('phone_number')
+        .eq('zone_location', alert.location);
+      
+      if (!error && data) {
+        numbersToAlert = data.map(r => r.phone_number);
+      }
+    } catch (err) {
+      console.error('[SMS] Error fetching residents from Supabase:', err.message);
+    }
+  }
+  
+  // If no numbers for this location, fallback to default environment variable
+  if (numbersToAlert.length === 0) {
+    const envNumbers = process.env.DEFAULT_AREA_NUMBERS;
+    if (envNumbers) {
+      numbersToAlert = envNumbers.split(',');
+    }
+  }
+
+  if (numbersToAlert.length === 0) {
+    console.warn(`[SMS] No contact numbers found for area: ${alert.location}`);
+    return false;
+  }
+
+  console.log(`[SMS] Sending area evacuation alerts to ${numbersToAlert.length} number(s) in ${alert.location}...`);
+
+  try {
+    const smsPromises = numbersToAlert.map((number) => {
+      return twilioClient.messages.create({
+        body: messageBody,
+        from: twilioNumber,
+        to: number.trim(),
+      });
+    });
+
+    await Promise.all(smsPromises);
+    console.log(`[SMS] Successfully sent area alerts for ${alert.location}`);
+    return true;
+  } catch (error) {
+    console.error('[SMS] Failed to send area alert SMS:', error.message);
+    return false;
+  }
+};
+
+module.exports = { sendAlertEmail, sendAlertSMS, sendAreaAlertSMS };

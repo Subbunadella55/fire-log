@@ -16,6 +16,7 @@ const {
 
 const { register, login, getMe } = require('../controllers/authController');
 const { generateReport } = require('../controllers/reportController');
+const { getResidents, addResident, updateResident, deleteResident } = require('../controllers/residentController');
 
 // ─────────────────────────────────────────────
 //  Validation middleware
@@ -75,6 +76,14 @@ router.patch(
 //  Report Routes
 // ─────────────────────────────────────────────
 router.get('/report/pdf', protect, requireRole('admin'), generateReport);
+
+// ─────────────────────────────────────────────
+//  Resident / SMS Contact Routes
+// ─────────────────────────────────────────────
+router.get('/residents', protect, requireRole('admin'), getResidents);
+router.post('/residents', protect, requireRole('admin'), addResident);
+router.put('/residents/:id', protect, requireRole('admin'), updateResident);
+router.delete('/residents/:id', protect, requireRole('admin'), deleteResident);
 
 // ─────────────────────────────────────────────
 //  Health check

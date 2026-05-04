@@ -5,6 +5,7 @@ import AlertLog from './pages/AlertLog'
 import SensorStatusPage from './pages/SensorStatusPage'
 import BlockchainPage from './pages/BlockchainPage'
 import AnalyticsPage from './pages/AnalyticsPage'
+import ResidentManager from './pages/ResidentManager'
 import FireDeptDashboard from './pages/FireDeptDashboard'
 import { AdminProvider } from './context/AdminContext'
 import { Outlet } from 'react-router-dom'
@@ -41,6 +42,7 @@ export default function App() {
           <Route path="/admin/sensors" element={<PrivateRoute role="admin"><SensorStatusPage /></PrivateRoute>} />
           <Route path="/admin/blockchain" element={<PrivateRoute role="admin"><BlockchainPage /></PrivateRoute>} />
           <Route path="/admin/analytics" element={<PrivateRoute role="admin"><AnalyticsPage /></PrivateRoute>} />
+          <Route path="/admin/residents" element={<PrivateRoute role="admin"><ResidentManager /></PrivateRoute>} />
 
           <Route path="/firedept" element={
             <PrivateRoute role="firedept">

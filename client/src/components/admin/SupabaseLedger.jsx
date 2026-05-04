@@ -1,6 +1,13 @@
+import { useState } from 'react';
 import './SupabaseLedger.css';
 
 export default function SupabaseLedger({ alerts }) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  
+  const totalPages = Math.max(1, Math.ceil(alerts.length / itemsPerPage));
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentAlerts = alerts.slice(startIndex, startIndex + itemsPerPage);
   return (
     <div className="ledger-card">
       <div className="ledger-header">
@@ -23,7 +30,7 @@ export default function SupabaseLedger({ alerts }) {
             </tr>
           </thead>
           <tbody>
-            {alerts.map(a => (
+            {currentAlerts.map(a => (
               <tr key={a._id}>
                 <td className="l-mono">...{a._id?.toString().slice(-6) || 'N/A'}</td>
                 <td>
@@ -69,6 +76,29 @@ export default function SupabaseLedger({ alerts }) {
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div className="ledger-footer">
+        <div className="ledger-count">
+          Showing {alerts.length === 0 ? 0 : startIndex + 1} – {Math.min(startIndex + itemsPerPage, alerts.length)} of {alerts.length}
+        </div>
+        <div className="ledger-pagination">
+          <button 
+            className="ledger-page-btn" 
+            disabled={currentPage === 1} 
+            onClick={() => setCurrentPage(p => p - 1)}
+          >
+            Prev
+          </button>
+          <span className="ledger-page-text">{currentPage} / {totalPages}</span>
+          <button 
+            className="ledger-page-btn" 
+            disabled={currentPage === totalPages} 
+            onClick={() => setCurrentPage(p => p + 1)}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );

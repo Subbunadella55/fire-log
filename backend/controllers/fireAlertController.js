@@ -8,7 +8,7 @@
 require('dotenv').config();
 const crypto = require('crypto');
 const blockchain = require('../config/blockchain');
-const { sendAlertEmail } = require('./notificationController');
+const { sendAlertEmail, sendAreaAlertSMS } = require('./notificationController');
 const supabase = require('../config/supabase');
 
 async function logToSupabase(data) {
@@ -377,6 +377,7 @@ const receiveFireAlert = async (req, res) => {
 
             if (severity === 'HIGH' || severity === 'CRITICAL') {
                 setImmediate(() => sendAlertEmail(newAlert).catch(console.error));
+                setImmediate(() => sendAreaAlertSMS(newAlert).catch(console.error));
             }
         }
 

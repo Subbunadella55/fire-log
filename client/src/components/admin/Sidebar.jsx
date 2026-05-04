@@ -4,7 +4,7 @@ import { useAdmin } from '../../context/AdminContext';
 import {
   LayoutDashboard, Bell, Activity, Link2, BarChart3,
   Shield, Settings, Search, ChevronLeft, ChevronRight,
-  Menu, X, LogOut, Circle,
+  Menu, X, LogOut, Circle, Users
 } from 'lucide-react';
 import './Sidebar.css';
 
@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { id: 'sensors',     label: 'Sensor Status', icon: Activity,        path: '/admin/sensors',   badge: null },
   { id: 'blockchain',  label: 'Blockchain',    icon: Link2,           path: '/admin/blockchain',badge: null },
   { id: 'analytics',   label: 'Analytics',     icon: BarChart3,       path: '/admin/analytics', badge: null },
+  { id: 'residents',   label: 'Residents',     icon: Users,           path: '/admin/residents', badge: null },
   { id: 'firedept',    label: 'Fire Dept',     icon: Shield,          path: '/firedept',        badge: null },
 ];
 
