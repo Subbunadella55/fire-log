@@ -25,6 +25,30 @@ async function logToSupabase(data) {
     }
 }
 
+// ── Buzzer State ──
+let buzzerState = { active: false, severity: null, activatedAt: null };
+
+function setBuzzer(severity) {
+    buzzerState = { active: true, severity, activatedAt: Date.now() };
+    console.log(`[Buzzer] Activated for ${severity} alert`);
+}
+
+function getBuzzerStatus(req, res) {
+    // Auto-clear buzzer after 30 seconds
+    if (buzzerState.active && buzzerState.activatedAt) {
+        if ((Date.now() - buzzerState.activatedAt) > 30000) {
+            buzzerState = { active: false, severity: null, activatedAt: null };
+        }
+    }
+    res.json({ buzzerActive: buzzerState.active, severity: buzzerState.severity });
+}
+
+function clearBuzzer(req, res) {
+    buzzerState = { active: false, severity: null, activatedAt: null };
+    console.log('[Buzzer] Silenced manually');
+    res.json({ success: true, message: 'Buzzer silenced.' });
+}
+
 function mapSupabaseToAlert(sb) {
     return {
         _id: sb.id || `sb_${sb.alert_hash || Date.now()}`,
@@ -144,9 +168,9 @@ function classifySeverity(temperature, smokeLevel) {
     else if (temperature >= temp.medium) tempScore = 30;
     else if (temperature >= temp.low) tempScore = 15;
 
-    if (smokeLevel >= smoke.high) smokeScore = 40;
-    else if (smokeLevel >= smoke.medium) smokeScore = 25;
-    else if (smokeLevel >= smoke.low) smokeScore = 15;
+    if (smokeLevel >= smoke.high) smokeScore = 80; // User defined high smoke = critical
+    else if (smokeLevel >= smoke.medium) smokeScore = 40;
+    else if (smokeLevel >= smoke.low) smokeScore = 25;
 
     const totalScore = tempScore + smokeScore;
 
@@ -293,6 +317,39 @@ const receiveFireAlert = async (req, res) => {
 
             console.log(`[Alert][MEM] ${deviceId} | Temp: ${temperature}°C | Smoke: ${smokeLevel} | ${severity}`);
 
+            if (isActiveAlert) {
+                // Trigger Buzzer for Critical
+                if (severity === 'CRITICAL') setBuzzer(severity);
+
+                setImmediate(async () => {
+                    try {
+                        const bcResult = await blockchain.logAlert({
+                            deviceId, temperature: parseFloat(temperature),
+                            humidity: parseFloat(humidity), smokeLevel: parseInt(smokeLevel),
+                            severity, location,
+                            latitude: parseFloat(latitude), longitude: parseFloat(longitude),
+                            sensorTimestamp,
+                        });
+                        if (bcResult) {
+                            newAlert.blockchainTxHash = bcResult.txHash;
+                            newAlert.blockchainAlertId = bcResult.alertId;
+                            newAlert.blockchainVerified = true;
+                            if (io) io.emit('blockchain-confirmed', {
+                                alertId: newAlert._id, txHash: bcResult.txHash, severity,
+                            });
+                        }
+                    } catch (bcErr) {
+                        newAlert.blockchainError = bcErr.message;
+                        console.error('[Blockchain] In-Memory error:', bcErr.message);
+                    }
+                });
+
+                if (severity === 'HIGH' || severity === 'CRITICAL') {
+                    setImmediate(() => sendAlertEmail(newAlert).catch(console.error));
+                    setImmediate(() => sendAreaAlertSMS(newAlert).catch(console.error));
+                }
+            }
+
             return res.status(201).json({
                 success: true,
                 message: 'Alert received (in-memory mode).',
@@ -351,6 +408,9 @@ const receiveFireAlert = async (req, res) => {
         }
 
         if (isActiveAlert) {
+            // Trigger Buzzer for Critical
+            if (severity === 'CRITICAL') setBuzzer(severity);
+
             setImmediate(async () => {
                 try {
                     const bcResult = await blockchain.logAlert({
@@ -626,5 +686,8 @@ module.exports = {
     updateAlertStatus,
     dispatchFireUnit,
     getStats,
+    getBuzzerStatus,
+    clearBuzzer,
+    setBuzzer,
     zoneManager,
 };

@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useAdmin } from '../context/AdminContext';
 import Navbar from '../components/Navbar';
+import AlarmOverlay from '../components/admin/AlarmOverlay';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import {
@@ -42,7 +43,7 @@ const CHART_OPTS = {
 export default function FireDeptDashboard() {
   const {
     allAlerts, stats, sensorOnline, resolveAlert, triggerTestAlert,
-    tempHistory, smokeHistory, labelHistory, API_BASE
+    tempHistory, smokeHistory, labelHistory, lastReading, API_BASE
   } = useAdmin();
 
   if (!stats) return <div className="fd-loading">Initializing Emergency Dispatch...</div>;
@@ -109,6 +110,7 @@ export default function FireDeptDashboard() {
 
   return (
     <div className="fd-root">
+      <AlarmOverlay active={hasCritical} />
       <Navbar roleName="Fire Department" />
 
       {/* Critical banner */}
@@ -146,6 +148,18 @@ export default function FireDeptDashboard() {
               </div>
             </div>
           </div>
+
+          {/* Last known reading when hardware is offline */}
+          {!sensorOnline && lastReading && (
+            <div className="fd-last-reading-bar">
+              <span className="fd-last-reading-icon">📡</span>
+              <strong>Last Known Reading</strong>
+              <span className="fd-last-reading-sep" />
+              <span>Temp: <strong>{lastReading.temperature}°C</strong></span>
+              <span>Smoke: <strong>{lastReading.smokeLevel}</strong></span>
+              <span className="fd-last-reading-time">at {new Date(lastReading.timestamp).toLocaleTimeString()}</span>
+            </div>
+          )}
 
           {/* Charts Row */}
           <div className="fd-charts">

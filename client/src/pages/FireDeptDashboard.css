@@ -42,6 +42,33 @@
   margin: 0 4px;
 }
 
+/* ── Last Known Reading Bar (shown when hardware offline) ── */
+.fd-last-reading-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  background: #f0f4ff;
+  border: 1px solid #c7d3f5;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: #1a1a1a;
+  flex-wrap: wrap;
+}
+.fd-last-reading-icon { font-size: 16px; }
+.fd-last-reading-sep {
+  width: 1px; height: 14px;
+  background: #c7d3f5;
+  margin: 0 4px;
+}
+.fd-last-reading-time {
+  margin-left: auto;
+  color: #6d7175;
+  font-size: 12px;
+  font-family: 'Courier New', monospace;
+}
+
 /* ── Page Layout ── */
 .fd-main { flex: 1; overflow-x: hidden; }
 .fd-layout {

@@ -19,10 +19,19 @@ export function useAdminDashboard(searchQuery = '') {
   const [zoneList, setZoneList] = useState([]);
   const [bcQueue, setBcQueue] = useState([]);
   const [toasts, setToasts] = useState([]);
-  const [alarmActive, setAlarmActive] = useState(false);
-  const [tempHistory, setTempHistory] = useState([]);
-  const [smokeHistory, setSmokeHistory] = useState([]);
-  const [labelHistory, setLabelHistory] = useState([]);
+  // Restore chart history from localStorage so logs survive disconnection
+  const [tempHistory, setTempHistory] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('pyro_tempHistory') || '[]'); } catch { return []; }
+  });
+  const [smokeHistory, setSmokeHistory] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('pyro_smokeHistory') || '[]'); } catch { return []; }
+  });
+  const [labelHistory, setLabelHistory] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('pyro_labelHistory') || '[]'); } catch { return []; }
+  });
+  const [lastReading, setLastReading] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('pyro_lastReading') || 'null'); } catch { return null; }
+  });
   const [severityCounts, setSeverityCounts] = useState({ CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0, NORMAL: 0 });
 
   const lastHeartbeatRef = useRef(0);
@@ -42,12 +51,16 @@ export function useAdminDashboard(searchQuery = '') {
 
   const removeToast = useCallback((id) => setToasts(prev => prev.filter(t => t.id !== id)), []);
 
-  // ── Alarm ──
-  const triggerAlarm = useCallback((isCritical) => {
-    setAlarmActive(true);
-    if (alarmTimerRef.current) clearTimeout(alarmTimerRef.current);
-    alarmTimerRef.current = setTimeout(() => setAlarmActive(false), 8000);
+  // ── Alarm — reactive to live critical alerts ──
+  const triggerAlarm = useCallback(() => {
+    // alarmActive is now driven reactively by allAlerts below
+    // This function kept for socket event compatibility
   }, []);
+
+  // Derive alarmActive from live allAlerts state
+  const alarmActive = allAlerts.some(
+    a => a.severity === 'CRITICAL' && a.status !== 'RESOLVED' && a.alertActive !== false
+  );
 
   // ── Hardware Status ──
   const updateHardwareOnline = useCallback((isOnline) => setSensorOnline(isOnline), []);
@@ -70,12 +83,28 @@ export function useAdminDashboard(searchQuery = '') {
       .catch(() => updateHardwareOnline(false));
   }, [updateHardwareOnline]);
 
-  // ── Charts update ──
+  // ── Charts update — persisted to localStorage ──
   const pushChartPoint = useCallback((temperature, smokeLevel, ts) => {
     const lbl = new Date(ts).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    setTempHistory(p => [...p.slice(-(CHART_MAX - 1)), parseFloat(temperature).toFixed(1)]);
-    setSmokeHistory(p => [...p.slice(-(CHART_MAX - 1)), parseInt(smokeLevel)]);
-    setLabelHistory(p => [...p.slice(-(CHART_MAX - 1)), lbl]);
+    setTempHistory(p => {
+      const next = [...p.slice(-(CHART_MAX - 1)), parseFloat(temperature).toFixed(1)];
+      localStorage.setItem('pyro_tempHistory', JSON.stringify(next));
+      return next;
+    });
+    setSmokeHistory(p => {
+      const next = [...p.slice(-(CHART_MAX - 1)), parseInt(smokeLevel)];
+      localStorage.setItem('pyro_smokeHistory', JSON.stringify(next));
+      return next;
+    });
+    setLabelHistory(p => {
+      const next = [...p.slice(-(CHART_MAX - 1)), lbl];
+      localStorage.setItem('pyro_labelHistory', JSON.stringify(next));
+      return next;
+    });
+    // Save last known reading
+    const reading = { temperature: parseFloat(temperature).toFixed(1), smokeLevel: parseInt(smokeLevel), timestamp: ts };
+    setLastReading(reading);
+    localStorage.setItem('pyro_lastReading', JSON.stringify(reading));
   }, []);
 
   // ── Severity counts ──
@@ -135,7 +164,31 @@ export function useAdminDashboard(searchQuery = '') {
         checkHardwareStatus();
         if (data.topPriority) setPriorityZone(data.topPriority);
         if (data.allZones) setZoneList(data.allZones);
-        valid.slice(0, CHART_MAX).reverse().forEach(a => pushChartPoint(a.temperature, a.smokeLevel, a.createdAt));
+
+        // ── Reset charts from real DB records (newest last = left→right on chart) ──
+        const chartPoints = valid.slice(0, CHART_MAX).reverse();
+        if (chartPoints.length > 0) {
+          const newLabels = chartPoints.map(a =>
+            new Date(a.createdAt || a.sensorTimestamp).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+          );
+          const newTemps  = chartPoints.map(a => parseFloat(a.temperature).toFixed(1));
+          const newSmokes = chartPoints.map(a => parseInt(a.smokeLevel));
+          setLabelHistory(newLabels);
+          setTempHistory(newTemps);
+          setSmokeHistory(newSmokes);
+          localStorage.setItem('pyro_labelHistory', JSON.stringify(newLabels));
+          localStorage.setItem('pyro_tempHistory',  JSON.stringify(newTemps));
+          localStorage.setItem('pyro_smokeHistory', JSON.stringify(newSmokes));
+          // Save last known reading from newest DB record
+          const newest = chartPoints[chartPoints.length - 1];
+          const reading = {
+            temperature: parseFloat(newest.temperature).toFixed(1),
+            smokeLevel: parseInt(newest.smokeLevel),
+            timestamp: newest.createdAt || newest.sensorTimestamp
+          };
+          setLastReading(reading);
+          localStorage.setItem('pyro_lastReading', JSON.stringify(reading));
+        }
       }
     } catch (e) {
       console.warn('[Fetch] Backend unavailable:', e.message);
@@ -247,6 +300,7 @@ export function useAdminDashboard(searchQuery = '') {
     stats, sensorOnline, priorityZone, zoneList, bcQueue,
     toasts, removeToast, alarmActive,
     tempHistory, smokeHistory, labelHistory, severityCounts,
+    lastReading,
     resolveAlert, triggerTestAlert, logout, API_BASE,
   };
 }

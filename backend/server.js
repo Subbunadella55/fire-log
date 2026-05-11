@@ -16,6 +16,7 @@ const helmet = require('helmet');
 const compression = require('compression');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const os = require('os');
 const { Server } = require('socket.io');
 const path = require('path');
 
@@ -220,8 +221,19 @@ const startServer = async () => {
             console.log('  Admin:    admin / admin123');
             console.log('  FireDept: firedept / firedept123\n');
             if (isUsingMemoryStore()) {
+                // Find local IP dynamically
+                const nets = os.networkInterfaces();
+                let localIp = '127.0.0.1';
+                for (const name of Object.keys(nets)) {
+                    for (const net of nets[name]) {
+                        if (net.family === 'IPv4' && !net.internal) {
+                            localIp = net.address;
+                            break;
+                        }
+                    }
+                }
                 console.log('  ⚠️  IN-MEMORY MODE: MongoDB not found. Data is temporary.');
-                console.log(`  📡 ESP8266 → POST http://192.168.137.84:${PORT}/api/fire-alert\n`);
+                console.log(`  📡 ESP8266 → POST http://${localIp}:${PORT}/api/fire-alert\n`);
             }
         });
     } catch (err) {

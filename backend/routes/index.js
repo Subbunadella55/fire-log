@@ -12,6 +12,8 @@ const {
     updateAlertStatus,
     dispatchFireUnit,
     getStats,
+    getBuzzerStatus,
+    clearBuzzer,
 } = require('../controllers/fireAlertController');
 
 const { register, login, getMe } = require('../controllers/authController');
@@ -73,6 +75,12 @@ router.patch(
 );
 
 // ─────────────────────────────────────────────
+//  Buzzer Command Endpoint (polled by ESP8266 — no auth needed)
+// ─────────────────────────────────────────────
+router.get('/buzzer-status', getBuzzerStatus);
+router.post('/buzzer-clear', protect, requireRole('admin', 'firedept'), clearBuzzer);
+
+// ─────────────────────────────────────────────
 //  Report Routes
 // ─────────────────────────────────────────────
 router.get('/report/pdf', protect, requireRole('admin'), generateReport);
@@ -89,11 +97,7 @@ router.delete('/residents/:id', protect, requireRole('admin'), deleteResident);
 //  Health check
 // ─────────────────────────────────────────────
 router.get('/health', (req, res) => {
-    res.json({
-        status: 'ok',
-        service: 'PyroChain API',
-        timestamp: new Date().toISOString(),
-    });
+    res.json({ status: 'ok', service: 'PyroChain API', timestamp: new Date().toISOString() });
 });
 
 module.exports = router;
